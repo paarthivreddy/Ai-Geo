@@ -5,7 +5,7 @@ from typing import Optional
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Response, status
-from fastapi.security import OAuth2PasswordRequestForm
+from fastapi.security import OAuth2PasswordRequestForm  # noqa: F401  (kept for OAuth2 token endpoint compat)
 from pydantic import BaseModel, EmailStr
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -99,11 +99,11 @@ async def register(
 @router.post("/login", response_model=TokenResponse)
 async def login(
     response: Response,
-    credentials: OAuth2PasswordRequestForm = Depends(),
+    request: LoginRequest,
     user_repo: UserRepository = Depends(lambda: container.infrastructure.repositories.user_repository()),
 ) -> TokenResponse:
-    """Login with email and password, return JWT tokens."""
-    user = await user_repo.get_by_email(credentials.username)
+    """Login with email and password (JSON body), return JWT tokens."""
+    user = await user_repo.get_by_email(request.email)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -116,7 +116,7 @@ async def login(
             detail="Account is inactive or locked",
         )
 
-    if not verify_password(credentials.password, user.password_hash):
+    if not verify_password(request.password, user.password_hash):
         # Increment failed attempts
         user.failed_login_attempts += 1
         if user.failed_login_attempts >= 5:
