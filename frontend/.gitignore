@@ -1,0 +1,15 @@
+# Gitignore for frontend
+node_modules
+.next
+out
+build
+*.log
+npm-debug.log*
+.DS_Store
+*.pem
+.vercel
+.turbo
+coverage
+.nyc_output
+*.tsbuildinfo
+next-env.d.ts
