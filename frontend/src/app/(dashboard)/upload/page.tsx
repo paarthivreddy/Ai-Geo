@@ -61,9 +61,9 @@ export default function UploadPage() {
       const formData = new FormData();
       formData.append("file", file);
 
-      const response = await api.post<UploadResponse>("/files/upload", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      // Axios auto-sets multipart/form-data with boundary when body is FormData.
+      // Manually setting Content-Type without boundary makes FastAPI reject with 422.
+      const response = await api.post<UploadResponse>("/files/upload", formData);
       setProfile(response.data);
 
       // Auto-map detected columns

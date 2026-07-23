@@ -214,11 +214,11 @@ class UploadUseCase:
             # Sample values
             sample = series.drop_nulls().head(5).to_list()
 
-            # Min/max length
+            # Min/max length (null when series entirely null — coerce to 0)
             str_series = series.cast(pl.Utf8)
             lengths = str_series.str.len_chars()
-            min_len = lengths.min()
-            max_len = lengths.max()
+            min_len = lengths.min() or 0
+            max_len = lengths.max() or 0
 
             # Pattern regex (simplified)
             pattern = self._infer_pattern(sample)
